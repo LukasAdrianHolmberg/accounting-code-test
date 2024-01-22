@@ -1,5 +1,7 @@
 package com.cubeia.controller;
 
+import com.cubeia.exceptions.CustomException;
+import com.cubeia.exceptions.NegativeAmountException;
 import com.cubeia.model.Transactions;
 import com.cubeia.model.Transfer;
 import com.cubeia.repository.AccountRepository;
@@ -61,7 +63,12 @@ public class AccountingController {
         Account input = accounts.findById(transfer.getInput()).orElseThrow(() -> new AccountNotFoundException(transfer.getInput()));
         Account output = accounts.findById(transfer.getOutput()).orElseThrow(() -> new AccountNotFoundException(transfer.getOutput()));
 
-        /* Check balamce on input account */
+        /* Make sure amount is a positive value */
+        if ( Double.compare(transfer.getAmount(), 0.0) < 0 ) {
+            throw new NegativeAmountException();
+        }
+
+        /* Check balance on input account */
         if ( transfer.getAmount() > input.getBalance() ) {
             throw new InsufficientBalanceException();
         }
